@@ -21,6 +21,8 @@ ProjectiveHook::ProjectiveHook() : PhysicsHook()
 	wtri = 1;
 	min_sval = 0.85;
 	max_sval = 1.1;
+	wpos = 50.0;
+	punch = -5.0;
 }
 
 
@@ -33,6 +35,8 @@ void ProjectiveHook::drawGUI(igl::opengl::glfw::imgui::ImGuiMenu &menu)
 		ImGui::InputDouble("min sval", &min_sval);
 		ImGui::InputDouble("max sval", &max_sval);
 		ImGui::InputDouble("w_tri", &wtri);
+		ImGui::InputDouble("w_pos", &wpos);
+		ImGui::InputDouble("mike tysons", &punch);
 		ImGui::InputText("Mesh file", meshFile);
 
     }
@@ -189,7 +193,7 @@ void ProjectiveHook::initSimulation()
 		coefficients.emplace_back(Triplet<double>(Q.rows() * 2 + positionIndices[i], 2, 1));
 		S.setFromTriplets(coefficients.begin(), coefficients.end());
 		SPosList.emplace_back(S);
-		LHS += 50 * (S * S.transpose());
+		LHS += wpos * (S * S.transpose());
 	}
 
 	solver.compute(LHS);
@@ -199,9 +203,9 @@ bool ProjectiveHook::simulationStep() {
     bool failure = false; // Used to exit simulation loop when we hit a NaN.
 	
 	if (clickedFace != -1) {
-		fExt(F(clickedFace, 0), 2) = -5;
-		fExt(F(clickedFace, 1), 2) = -5;
-		fExt(F(clickedFace, 2), 2) = -5;
+		fExt(F(clickedFace, 0), 2) = punch;
+		fExt(F(clickedFace, 1), 2) = punch;
+		fExt(F(clickedFace, 2), 2) = punch;
 	}
 
 	// compute s_n
@@ -260,7 +264,7 @@ bool ProjectiveHook::simulationStep() {
 		}
 
 		for (int i = 0; i < positionIndices.size(); ++i) {
-			RHS += 50 * SPosList[i] * Q0.row(positionIndices[i]);
+			RHS += wpos * SPosList[i] * Q0.row(positionIndices[i]);
 		}
 		//std::cout << "RHS : " << RHS.rows() << ", " << RHS.cols() << std::endl;
 		//std::cout << RHS.format(CleanFmt) << std::endl;

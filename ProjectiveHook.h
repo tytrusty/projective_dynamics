@@ -70,6 +70,8 @@ public:
     double dt;
     double gravity;
 	double wtri;
+	double wpos;
+	double punch;
 	double min_sval;
 	double max_sval;
     std::string meshFile;
